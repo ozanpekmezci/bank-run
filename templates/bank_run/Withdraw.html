@@ -1,0 +1,24 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Withdraw or not? Period {{ period }}
+{% endblock %}
+
+{% block content %}
+
+    {% include 'bank_run/Instructions.html' %}
+
+
+    {% if forced_withdraw  %}
+        <h1>
+            You are chosen randomly by the system and you have to withdraw at least {{ forced_withdraw_in_period1_minimum_amount }}.
+            If you enter a smaller value than {{forced_withdraw_in_period1_minimum_amount}}, the amount of currency will be withdrawn anyways.
+        </h1>
+    {% endif %}
+
+    {% formfield player.withdraw with label="How much do you want to withdraw?" %}
+
+    {% next_button %}
+
+{% endblock %}

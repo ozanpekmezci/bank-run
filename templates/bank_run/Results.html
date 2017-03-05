@@ -1,0 +1,86 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Results
+{% endblock %}
+
+{% block content %}
+     <table class="table">
+        <tr>
+            <th>Round</th>
+            <th>Total money you have</th>
+            <th>Status</th>
+        </tr>
+        {% for p in player_in_all_rounds %}
+            <tr>
+                <td>{{ p.subsession.round_number }}</td>
+                <td>
+                    {{ p.payoff }}
+                </td>
+                <td>
+                    {% if joined  %}
+                        You are taking risk
+                    {% else %}
+                        Your money is on a risk-free  investment
+                    {% endif %}
+                </td>
+
+            </tr>
+        {% endfor %}
+    </table>
+    {% if bankrupt %}
+        <h1>
+            The Bank went Bankrupt!
+        </h1>
+
+    {% endif %}
+    <p> The last round of the game is {{ last_round }}. You have  {{money_at_hand}} amount of currency at hand. </p>
+    {%if possible_to_watch_others or end %}
+        <table class="table">
+        <tr>
+            <th>Player</th>
+            <th>Money</th>
+            <th>Status</th>
+            <th>Withdrew?</th>
+        </tr>
+        {% for p in all_players %}
+            <tr>
+                <td>{{ p.id_in_group }}</td>
+                <td>
+                    {{ p.payoff }}
+                </td>
+
+                <td>
+                    {% if p.id_in_group in all_players_join_situation  %}
+                        Taking risk
+                    {% else %}
+                        Risk-free investment
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if p.id_in_group in all_players_withdrew_situation %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    {%if end == False %}
+        {% next_button %}
+    {% else %}
+        <h1>
+            The game has ended.
+        </h1>
+    {% endif %}
+
+
+{% endblock %}
+
+

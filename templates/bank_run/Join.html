@@ -1,0 +1,25 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    You can decide to put your money on a bank or on a risk-free investment.
+{% endblock %}
+
+{% block content %}
+
+<!--
+Documentation on how to write a django template here:
+https://docs.djangoproject.com/en/1.8/ref/templates/language/
+
+Bootstrap comes pre-loaded, so you can use any Bootstrap elements:
+http://getbootstrap.com/components/
+
+-->
+    <p>
+    You have {{ starting_money }} amount of money and you can decide to put your money on a bank or on a risk-free investment.
+        You can't change this later.
+    </p>
+{% formfield player.join with label="I choose:" %}
+    {% next_button %}
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% load otree_tags staticfiles %}
+
+<div class="instructions well well-lg">
+
+    <h3 class="panel-sub-heading">
+        Instructions
+    </h3>
+   <p>
+        You have  {{money_at_hand}} amount of currency at hand
+        and have  {{money_at_bank}} amount of currecy deposited at bank. You can maximally deposit {{money_at_bank}}.
+        Enter a value between 0 and {{money_at_bank}}.
+        If you enter a bigger value {{money_at_bank}} amount of currency will be withdrawn anyways.
+        If you don't want to withdraw just enter 0.
+    </p>
+
+</div>
