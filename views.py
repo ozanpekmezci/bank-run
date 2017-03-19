@@ -52,7 +52,8 @@ class Withdraw(Page):
     def before_next_page(self):
         #only withdrawals of unique players are counted
         if self.player.withdraw != c(0) and self.player.participant.vars.get("withdrew",False) is False:
-            self.session.vars["amount_of_players_withdrew"] += 1
+            #self.session.vars["amount_of_players_withdrew"] += 1
+            self.session.vars["total_money_withdrew"] += self.player.withdraw
             self.player.participant.vars["withdrew"] = True
 
 
@@ -81,7 +82,7 @@ class Results(Page):
             'joined': self.player.in_all_rounds()[0].joined,
             'money_at_hand': self.player.participant.vars.get("money_at_hand","0"),
             'bankrupt': self.session.vars.get("bankrupt",False),
-            'amount': self.session.vars.get("amount_of_players_withdrew",0),
+            'total_money_withdrew': self.session.vars.get("total_money_withdrew",c(0)),
             'end': self.round_number == self.session.config['number_rounds'] or self.session.vars.get("bankrupt",False) is True,
             'last_round': self.session.config['number_rounds'],
             'possible_to_watch_others': self.session.config['possible_to_watch_others'],

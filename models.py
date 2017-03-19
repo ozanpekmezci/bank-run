@@ -36,7 +36,8 @@ class Subsession(BaseSubsession):
         if self.round_number == 1:
             logging.warning("round 1 ")
             self.session.vars["bankrupt"] = False
-            self.session.vars["amount_of_players_withdrew"] = 0
+            self.session.vars["total_money_of_bank"] = c(0)
+            self.session.vars["total_money_withdrew"] = c(0)
             self.session.vars["amount_of_players"] = len(self.get_players())
             for p in self.get_players():
                 p.payoff = c(self.session.config['starting_money'])
@@ -83,14 +84,15 @@ class Group(BaseGroup):
                 p.participant.vars["money_at_bank"] = c(self.session.config['starting_money'])
                 p.participant.vars["money_at_hand"] = c(0)
                 p.payoff = p.participant.vars["money_at_bank"]
+                self.session.vars["total_money_of_bank"] += p.participant.vars["money_at_bank"]
             elif p.join == 'Put money on a risk-free investment':
                 p.joined = False
                 p.participant.vars["joined"] = False
                 p.participant.vars["money_at_hand"] = c(0)
 
     def set_bank(self):
-        if self.session.vars.get("amount_of_players_withdrew", 0) >=\
-                (self.session.vars.get("amount_of_players", 0) * self.session.config['required_percent_for_bank_run']):
+        if self.session.vars.get("total_money_withdrew", c(0)) >=\
+                (self.session.vars.get("total_money_of_bank", c(0)) * self.session.config['required_percent_for_bank_run']):
             self.session.vars["bankrupt"] = True
         if self.round_number != self.session.config['number_rounds'] and self.session.vars.get("bankrupt",False) is False:
             for p in self.get_players():
