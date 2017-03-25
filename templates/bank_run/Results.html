@@ -42,7 +42,6 @@
             <th>Player</th>
             <th>Money</th>
             <th>Status</th>
-            <th>Withdrew?</th>
         </tr>
         {% for p in all_players %}
             <tr>
@@ -56,14 +55,6 @@
                         Taking risk
                     {% else %}
                         Risk-free investment
-                    {% endif %}
-                </td>
-
-                <td>
-                    {% if p.id_in_group in all_players_withdrew_situation %}
-                        Yes
-                    {% else %}
-                        No
                     {% endif %}
                 </td>
 

@@ -31,10 +31,8 @@ class Constants(BaseConstants):
 class Subsession(BaseSubsession):
     #problem: this method is called at the beginning for every round: so dont't use variables that change during the game
     def before_session_starts(self):
-        logging.warning(self.round_number)
         #Period 0
         if self.round_number == 1:
-            logging.warning("round 1 ")
             self.session.vars["bankrupt"] = False
             self.session.vars["total_money_of_bank"] = c(0)
             self.session.vars["total_money_withdrew"] = c(0)
@@ -45,7 +43,6 @@ class Subsession(BaseSubsession):
                 p.participant.vars["money_at_hand"] = c(self.session.config['starting_money'])
                 p.participant.vars["money_at_bank"] = c(0)
                 p.participant.vars["joined"] = False
-                p.participant.vars["withdrew"] = False
         #Period 1
         if 2 <= self.round_number < self.session.config['number_rounds']:
             for p in self.get_players():
@@ -53,24 +50,13 @@ class Subsession(BaseSubsession):
                 if rand <= self.session.config['forced_withdraw_in_period1_percent']:
                     p.forced_withdraw = True
 
-        if self.round_number >= 3:
-            logging.warning("round 3 ")
-
 
 class Group(BaseGroup):
     def set_payoffs(self):
         for p in self.get_players():
             if p.participant.vars.get("joined", False):
-                if p.withdraw <= p.participant.vars["money_at_bank"]:
-                    if p.forced_withdraw:
-                        if p.withdraw <= self.session.config['forced_withdraw_in_period1_minimum_amount']:
-                            p.withdraw = c(self.session.config['forced_withdraw_in_period1_minimum_amount'])
-
-                    p.participant.vars["money_at_hand"] += p.withdraw
-                    p.participant.vars["money_at_bank"] -= p.withdraw
-                else:
-                    p.participant.vars["money_at_hand"] += p.participant.vars["money_at_bank"]
-                    p.participant.vars["money_at_bank"] = c(0)
+                p.participant.vars["money_at_hand"] += p.withdraw
+                p.participant.vars["money_at_bank"] -= p.withdraw
                 p.payoff = p.participant.vars.get("money_at_hand",0) + p.participant.vars.get("money_at_bank",0)
 
             else:
@@ -91,9 +77,8 @@ class Group(BaseGroup):
                 p.participant.vars["money_at_hand"] = c(0)
 
     def set_bank(self):
-        if self.session.vars.get("total_money_withdrew", c(0)) >=\
-                (self.session.vars.get("total_money_of_bank", c(0)) * self.session.config['required_percent_for_bank_run']):
-            self.session.vars["bankrupt"] = True
+        #if self.session.vars.get("total_money_withdrew", c(0)) >=\
+         #       (self.session.vars.get("total_money_of_bank", c(0)) * self.session.config['required_percent_for_bank_run']):
         if self.round_number != self.session.config['number_rounds'] and self.session.vars.get("bankrupt",False) is False:
             for p in self.get_players():
                 if p.participant.vars.get("joined", False):
@@ -107,7 +92,7 @@ class Group(BaseGroup):
                 else:
                     p.payoff = c(self.session.config['starting_money'])
                     #p.participant.vars["money_at_hand"] = c(self.session.config['starting_money'])
-        if self.session.vars.get("bankrupt",False) is True:
+        elif self.session.vars.get("bankrupt",False) is True:
             for p in self.get_players():
                 if p.participant.vars.get("joined", False):
                     p.participant.vars["money_at_bank"] = 0

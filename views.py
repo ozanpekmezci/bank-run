@@ -2,6 +2,7 @@ from otree.api import Currency as c, currency_range
 from . import models
 from ._builtin import Page, WaitPage
 from .models import Constants
+import logging
 
 
 class Join(Page):
@@ -37,7 +38,7 @@ class Withdraw(Page):
     timeout_submission = {'withdraw': c(0)}
 
     def is_displayed(self):
-        if 2 <= self.round_number < self.session.config['number_rounds'] and self.player.in_all_rounds()[0].joined and self.session.vars.get("bankrupt",False) is False:
+        if 2 <= self.round_number < self.session.config['number_rounds'] and self.player.in_all_rounds()[0].joined:
             return True
 
     def vars_for_template(self):
@@ -51,15 +52,34 @@ class Withdraw(Page):
 
     def before_next_page(self):
         #only withdrawals of unique players are counted
-        if self.player.withdraw != c(0) and self.player.participant.vars.get("withdrew",False) is False:
-            #self.session.vars["amount_of_players_withdrew"] += 1
-            self.session.vars["total_money_withdrew"] += self.player.withdraw
-            self.player.participant.vars["withdrew"] = True
+        #TODO withdrew meselesi
+        #TODO set_bank'te forced olanlar ne boh yiyecek
+        #TODO forced ama o kadar parasi yoksa
+        #TODO multiple round test, multiple withdraw test, son round olayini adam et ve onu da test et
+        total_money_withdrew = self.session.vars.get("total_money_withdrew", c(0))
+        total_money_of_bank = self.session.vars.get("total_money_of_bank", c(0))
+        required_percent_for_bank_run = self.session.config['required_percent_for_bank_run']
+        minimum_withdraw_amount = self.session.config['forced_withdraw_in_period1_minimum_amount']
+
+        if self.player.forced_withdraw:
+            if self.player.withdraw <= minimum_withdraw_amount:
+                self.player.withdraw = c(minimum_withdraw_amount)
+
+        if self.player.withdraw > self.player.participant.vars["money_at_bank"] :
+            self.player.withdraw = self.player.participant.vars["money_at_bank"]
+
+        if total_money_withdrew >= (total_money_of_bank * required_percent_for_bank_run):
+            #already went bankrupt
+            self.player.withdraw = c(0)
+        elif (self.player.withdraw + total_money_withdrew) >= (total_money_of_bank * required_percent_for_bank_run):
+            self.player.withdraw = total_money_of_bank * required_percent_for_bank_run - total_money_withdrew
+            self.session.vars["bankrupt"] = True
+        self.session.vars["total_money_withdrew"] += self.player.withdraw
 
 
 class WithdrawWaitPage(WaitPage):
     def is_displayed(self):
-        return 2 <= self.round_number < self.session.config['number_rounds'] and self.session.vars.get("bankrupt",False) is False
+        return 2 <= self.round_number < self.session.config['number_rounds']
 
     def after_all_players_arrive(self):
         self.group.set_payoffs()
@@ -87,7 +107,6 @@ class Results(Page):
             'last_round': self.session.config['number_rounds'],
             'possible_to_watch_others': self.session.config['possible_to_watch_others'],
             'all_players': self.group.get_players(),
-            'all_players_withdrew_situation': [ p.id_in_group for p in self.group.get_players() if p.participant.vars.get("withdrew",False)],
             'all_players_join_situation': [p.id_in_group for p in self.group.get_players() if p.in_all_rounds()[0].joined],
             'player_id': self.player.id_in_group,
         }
