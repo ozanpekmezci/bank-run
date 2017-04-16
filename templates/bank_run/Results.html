@@ -6,11 +6,17 @@
 {% endblock %}
 
 {% block content %}
+
+    {% if bankrupt %}
+        <h3>
+            The Bank went Bankrupt!
+        </h3>
+    {% endif %}
+
      <table class="table">
         <tr>
             <th>Round</th>
             <th>Total money you have</th>
-            <th>Status</th>
         </tr>
         {% for p in player_in_all_rounds %}
             <tr>
@@ -18,24 +24,34 @@
                 <td>
                     {{ p.payoff }}
                 </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <table class="table">
+        <tr>
+            <th>Your money at hand</th>
+            <th>Your money at bank</th>
+            <th>Your Status</th>
+        </tr>
+            <tr>
+                <td>
+                    {{ money_at_hand }}
+                </td>
+                <td>
+                    {{ money_at_bank }}
+                </td>
                 <td>
                     {% if joined  %}
-                        You are taking risk
+                        You took risk
                     {% else %}
                         Your money is on a risk-free  investment
                     {% endif %}
                 </td>
-
             </tr>
-        {% endfor %}
     </table>
-    {% if bankrupt %}
-        <h1>
-            The Bank went Bankrupt!
-        </h1>
 
-    {% endif %}
-    <p> The last round of the game is {{ last_round }}. You have  {{money_at_hand}} amount of currency at hand. </p>
+    <p> The last round of the game is {{ last_round }}.</p>
     {%if possible_to_watch_others or end %}
         <table class="table">
         <tr>
@@ -52,7 +68,7 @@
 
                 <td>
                     {% if p.id_in_group in all_players_join_situation  %}
-                        Taking risk
+                        Took risk
                     {% else %}
                         Risk-free investment
                     {% endif %}
@@ -66,9 +82,9 @@
     {%if end == False %}
         {% next_button %}
     {% else %}
-        <h1>
+        <h3>
             The game has ended.
-        </h1>
+        </h3>
     {% endif %}
 
 

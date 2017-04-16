@@ -11,10 +11,15 @@
 
 
     {% if forced_withdraw  %}
-        <h1>
-            You are chosen randomly by the system and you have to withdraw at least {{ forced_withdraw_in_period1_minimum_amount }}.
-            If you enter a smaller value than {{forced_withdraw_in_period1_minimum_amount}}, the amount of currency will be withdrawn anyways.
-        </h1>
+        <div class="instructions well well-lg">
+            <h3 class="panel-sub-heading">
+                Warning!
+            </h3>
+            <p>
+                You are chosen randomly by the system and you have to withdraw at least {{ forced_withdraw_minimum_amount }}.
+                If you enter a smaller value than {{forced_withdraw_minimum_amount}}, the amount of currency will be withdrawn anyways.
+            </p>
+        </div>
     {% endif %}
 
     {% formfield player.withdraw with label="How much do you want to withdraw?" %}

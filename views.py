@@ -38,28 +38,24 @@ class Withdraw(Page):
     timeout_submission = {'withdraw': c(0)}
 
     def is_displayed(self):
-        if 2 <= self.round_number < self.session.config['number_rounds'] and self.player.in_all_rounds()[0].joined:
+        if 2 <= self.round_number <= self.session.config['number_rounds'] and self.player.in_all_rounds()[0].joined:
             return True
 
     def vars_for_template(self):
         return{
             'money_at_hand': self.player.participant.vars.get("money_at_hand","0"),
             'money_at_bank': self.player.participant.vars.get("money_at_bank", "0"),
-            'period': self.round_number-1,
+            'period': self.round_number,
             'forced_withdraw': self.player.forced_withdraw,
-            'forced_withdraw_in_period1_minimum_amount': self.session.config['forced_withdraw_in_period1_minimum_amount']
+            'forced_withdraw_minimum_amount': self.session.config['forced_withdraw_minimum_amount']
         }
 
     def before_next_page(self):
         #only withdrawals of unique players are counted
-        #TODO withdrew meselesi
-        #TODO set_bank'te forced olanlar ne boh yiyecek
-        #TODO forced ama o kadar parasi yoksa
-        #TODO multiple round test, multiple withdraw test, son round olayini adam et ve onu da test et
         total_money_withdrew = self.session.vars.get("total_money_withdrew", c(0))
         total_money_of_bank = self.session.vars.get("total_money_of_bank", c(0))
         required_percent_for_bank_run = self.session.config['required_percent_for_bank_run']
-        minimum_withdraw_amount = self.session.config['forced_withdraw_in_period1_minimum_amount']
+        minimum_withdraw_amount = self.session.config['forced_withdraw_minimum_amount']
 
         if self.player.forced_withdraw:
             if self.player.withdraw <= minimum_withdraw_amount:
@@ -79,7 +75,7 @@ class Withdraw(Page):
 
 class WithdrawWaitPage(WaitPage):
     def is_displayed(self):
-        return 2 <= self.round_number < self.session.config['number_rounds']
+        return 2 <= self.round_number <= self.session.config['number_rounds']
 
     def after_all_players_arrive(self):
         self.group.set_payoffs()
@@ -101,6 +97,7 @@ class Results(Page):
             'player_in_all_rounds': self.player.in_all_rounds(),
             'joined': self.player.in_all_rounds()[0].joined,
             'money_at_hand': self.player.participant.vars.get("money_at_hand","0"),
+            'money_at_bank': self.player.participant.vars.get("money_at_bank", "0"),
             'bankrupt': self.session.vars.get("bankrupt",False),
             'total_money_withdrew': self.session.vars.get("total_money_withdrew",c(0)),
             'end': self.round_number == self.session.config['number_rounds'] or self.session.vars.get("bankrupt",False) is True,
