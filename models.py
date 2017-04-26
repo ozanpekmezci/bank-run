@@ -30,7 +30,7 @@ class Constants(BaseConstants):
 class Subsession(BaseSubsession):
     #problem: this method is called at the beginning for every round: so don't use variables that change during the game
     def before_session_starts(self):
-        #Period 0
+        #Period 1
         if self.round_number == 1:
             self.session.vars["bankrupt"] = False
             self.session.vars["total_money_of_bank"] = c(0)
@@ -41,7 +41,7 @@ class Subsession(BaseSubsession):
                 p.participant.vars["money_at_hand"] = c(self.session.config['starting_money'])
                 p.participant.vars["money_at_bank"] = c(0)
                 p.participant.vars["joined"] = False
-        #Period 1
+        #Period 2
         if 2 <= self.round_number <= self.session.config['number_rounds']:
             for p in self.get_players():
                 rand = random.uniform(0, 1)
